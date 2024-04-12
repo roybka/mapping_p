@@ -17,19 +17,19 @@ https://miro.com/app/board/uXjVNsOO4xI=/?share_link_id=663892784436
 Code generation:
 - copilot - https://copilot.microsoft.com/ (also in word/edge browser)
 - https://huggingface.co/blog/starcoder
-research - focused
+
+Research - focused:
 - elicit - https://elicit.com/
 - humata https://www.humata.ai/
 - researchrabbit - https://www.researchrabbit.ai/
 
 ## Useful links for learning p5js 
 - https://p5js.org/ (p5js homepage)
-- https://andreasref.github.io/p5js/ (main exersice for workshop)
+- https://andreasref.github.io/p5js/ (basic exersices)
 - https://nycdoe-cs4all.github.io/index.html (nice course)
 - https://processing.org/ (processing homepage)
 - https://www.codecademy.com/learn/learn-p5js (Also nice course)
 - http://wykhuh.github.io/shiffman-p5-tutorials/ Amazing guide  with youtube channel https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw
-Don't forget your mama and papa: Google and ChatGPT!
 
 ## Books / papers
 - https://mitpressbookstore.mit.edu/book/9781484297797 Coding Art: A Guide to Unlocking Your Creativity with the Processing Language and P5.Js in Four Simple Steps (Design Thinking)
