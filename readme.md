@@ -1,7 +1,8 @@
 #  AI in coding and installation workshop spring 24'
 ## Contents
 - lines is the main demo you need to start working (using mouse for simulating people movement 
-###Contents you shouldn't care about (internal mechanisms for making it all work)
+
+### Contents you shouldn't care about (internal mechanisms for making it all work)
 - lines_demo is a demo using mouse for two projectors projection with no shadows (not ready yet)
 - calibrate_cam has code for calibrating the camera (not ready yet)
 - calibrate_cam has code for calibrating the projection (not ready yet(?))
