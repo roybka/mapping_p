@@ -1,6 +1,6 @@
 #  AI in coding and installation workshop spring 24'
 ## Contents
-- lines is the main demo you need to start working (using mouse for simulating people movement 
+- lines is the main demo you need to start working (using mouse for simulating people movement) 
 
 ### Contents you shouldn't care about (internal mechanisms for making it all work)
 - lines_demo is a demo using mouse for two projectors projection with no shadows (not ready yet)
@@ -14,7 +14,7 @@
 https://miro.com/app/board/uXjVKVc8vFs=/?share_link_id=391490905316 (course think tank)
 https://miro.com/app/board/uXjVNsOO4xI=/?share_link_id=663892784436 (LLMs)
 
-##Engines
+## Engines
 
 - Openai chatgpt - https://chat.openai.com/
 - Claude - https://claude.ai/chats
