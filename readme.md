@@ -11,8 +11,8 @@
 - resources holds the files, media etc. 
 
 ## Miro Boards
-https://miro.com/app/board/uXjVKVc8vFs=/?share_link_id=391490905316 (course think tank)
-https://miro.com/app/board/uXjVNsOO4xI=/?share_link_id=663892784436 (LLMs)
+- https://miro.com/app/board/uXjVKVc8vFs=/?share_link_id=391490905316 (course think tank)
+- https://miro.com/app/board/uXjVNsOO4xI=/?share_link_id=663892784436 (LLMs)
 
 ## Engines
 
@@ -33,6 +33,11 @@ Research - focused:
 - humata https://www.humata.ai/
 - researchrabbit - https://www.researchrabbit.ai/
 
+## Inspiration
+- Refiq Anadol
+- Roelof Knol
+- TeamLab
+- Ryoji Ikeda
 ## Useful links for learning p5js 
 - https://p5js.org/ (p5js homepage)
 - https://andreasref.github.io/p5js/ (basic exersices)
