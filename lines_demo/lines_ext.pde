@@ -1,4 +1,7 @@
 
+// creates the lines demo, for two projectors, and fills black near each person so that no shadow is seen. 
+
+
 SecondWindow secondWindow; // Declare the second window
 
 ArrayList<Line> lines; // List to store lines
@@ -15,6 +18,9 @@ boolean iterating=false;
 int mx;
 int my;
 int st;
+int rad=200;
+int skew=5;
+
 
 void setup() {
     //fullScreen();
@@ -72,7 +78,7 @@ void draw() {
   }
     
   println(millis()-st);
-  paintBlackToLeft(this,mx);
+  paintBlackToLeft(this,mx,my);
 }
 
 // Line class
@@ -101,28 +107,35 @@ class Line {
 
   }
 }
+float euclideanDistance(float x1, float y1, float x2, float y2) {
+  float dx = x2 - x1;  // Difference in x-coordinates
+  float dy = y2 - y1;  // Difference in y-coordinates
+  return sqrt(dx * dx + skew*dy * dy);  // Square root of the sum of the squares of differences
+}
 
-void paintBlackToLeft(PApplet applet,int xThreshold) {
+void paintBlackToLeft(PApplet applet,int xThreshold,int yThreshold) {
   applet.loadPixels(); // Load the pixels into the pixels array
   
   for (int y = 0; y < applet.height; y++) {
     for (int x = 0; x < xThreshold; x++) {
+      if ( euclideanDistance(x,y,xThreshold,yThreshold)<rad){
       int index = x + y * applet.width; // Calculate the index in the pixels array
       applet.pixels[index] = color(0); // Set the pixel color to black
-    }
+    }}
   }
   
   applet.updatePixels(); // Apply the changes to the canvas
 }
 
-void paintBlackToRight(PApplet applet,int xThreshold) {
+void paintBlackToRight(PApplet applet,int xThreshold,int yThreshold) {
   applet.loadPixels(); // Load the pixels into the pixels array
   
   for (int y = 0; y < applet.height; y++) {
     for (int x = xThreshold; x < applet.width; x++) {
+      if ( euclideanDistance(x,y,xThreshold,yThreshold)<rad){
       int index = x + y * applet.width; // Calculate the index in the pixels array
       applet.pixels[index] = color(0); // Set the pixel color to black
-    }
+    }}
   }
   
   applet.updatePixels(); // Apply the changes to the canvas
@@ -151,6 +164,6 @@ public class SecondWindow extends PApplet {
     line.display(this);
   }
   iterating=false;
-  paintBlackToRight(this,mx);
+  paintBlackToRight(this,mx,my);
 }
 }
