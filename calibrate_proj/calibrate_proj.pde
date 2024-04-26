@@ -28,12 +28,30 @@ class DraggablePoint {
     }
   }
 }
+void keyPressed() {
+  if (key == 's' || key == 'S') {
+    savePoints();
+  }
+}
 
+void savePoints() {
+  String[] coords = new String[points.length+2];
+  for (int i = 0; i < points.length; i++) {
+    coords[i] = points[i].x + "," + points[i].y;
+    println("Point " + (i+1) + ": (" + points[i].x + ", " + points[i].y + ")");
+  }
+  coords[4] =  str(width);
+  coords[5]= str(height);
+  saveStrings("../resources/rectangle_corners.csv", coords);
+  println("Coordinates saved to rectangle_corners.csv");
+  exit(); 
+}
 // Initialize four corner points
 DraggablePoint[] points = new DraggablePoint[4];
 
 void setup() {
-  size(640, 480);
+  //size(640, 480);
+  fullScreen(P3D, 1);
   // Initialize points at the four corners of the canvas
   points[0] = new DraggablePoint(100, 100);
   points[1] = new DraggablePoint(width - 100, 100);
@@ -47,20 +65,4 @@ void draw() {
     point.checkDragging();
     point.drawPoint();
   }
-}
-
-void keyPressed() {
-  if (key == 's' || key == 'S') {
-    savePoints();
-  }
-}
-
-void savePoints() {
-  String[] coords = new String[points.length];
-  for (int i = 0; i < points.length; i++) {
-    coords[i] = points[i].x + "," + points[i].y;
-    println("Point " + (i+1) + ": (" + points[i].x + ", " + points[i].y + ")");
-  }
-  saveStrings("../resources/rectangle_corners.csv", coords);
-  println("Coordinates saved to rectangle_corners.csv");
 }
