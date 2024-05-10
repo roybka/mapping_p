@@ -1,13 +1,12 @@
 // not ready.
 // todo: make objects persistent
-// todo: support multiple objects
 // todo: kalman filter?
 // # make more efficient? (applymatrix calls)
 import processing.net.*;
 String data = "";
 int st=0;
 int port=12345;
-String a = "Nothing";
+String nothing = "Nothing";
 PMatrix m;
 float[][] matrix = new float[4][4];
 float[][] matrix_cam = new float[4][4];
@@ -21,6 +20,28 @@ void loadMatrixFromFile(String filename, float[][] mat) {
       mat[i][j] = float(cols[j]);
     }
   }
+}
+
+void drawObjects(String data) {
+  println("Data received: " + data);
+  ArrayList<float[]> objectData = parseData(data);
+  for (float[] obj : objectData) {
+    circle((int) obj[3], (int) obj[4], 50);  // Example of drawing a circle for each object
+  }
+}
+
+ArrayList<float[]> parseData(String data) {
+  ArrayList<float[]> list = new ArrayList<float[]>();
+  String[] items = split(data.substring(1, data.length() - 1), "],[");
+  for (String item : items) {
+    String[] elements = split(item, ",");
+    float[] floats = new float[elements.length];
+    for (int j = 0; j < elements.length; j++) {
+      floats[j] = parseFloat(elements[j]);
+    }
+    list.add(floats);
+  }
+  return list;
 }
 
 void setup() {
@@ -37,7 +58,6 @@ void setup() {
     0, 0, 1, 0,
     matrix[2][0], matrix[2][1], 0, matrix[2][2]);
   //printMatrix();
-
 }
 
 void draw() {
@@ -61,10 +81,7 @@ void draw() {
   if (myClient.available() > 0) {
     data = myClient.readString();
     println(data);
-  if (data.equals(a)==false) {
-      println("plotting");
-      float[] list = float(split(data, ','));
-      circle(int(list[0]), int(list[1]), 50);
-    }
-  }  
-}
+    if (data != null && !data.equals(nothing)) {
+       drawObjects(data);
+  }
+}}
