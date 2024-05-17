@@ -38,6 +38,8 @@ Research - focused:
 - Roelof Knol
 - TeamLab
 - Ryoji Ikeda
+- http://www.generative-gestaltung.de/2/
+
 ## Useful links for learning p5js 
 - https://p5js.org/ (p5js homepage)
 - https://andreasref.github.io/p5js/ (basic exersices)
