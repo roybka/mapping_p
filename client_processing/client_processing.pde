@@ -5,7 +5,7 @@
 import processing.net.*;
 String data = "";
 int st=0;
-int port=12345;
+int port=12346;
 String nothing = "Nothing";
 PMatrix m;
 float[][] matrix = new float[4][4];
@@ -51,7 +51,7 @@ void setup() {
   // Connect to the server's IP and the port
   myClient = new Client(this, "127.0.0.1", port); // Use the correct IP and port
   loadMatrixFromFile("../resources/transformation_matrix.csv", matrix);
-  loadMatrixFromFile("../resources/m_transformation_matrix.csv", matrix_cam);
+  loadMatrixFromFile("../resources/camera_transformation_matrix.csv", matrix_cam);
   fill(0);
   applyMatrix(matrix[0][0], matrix[0][1], 0, matrix[0][2],
     matrix[1][0], matrix[1][1], 0, matrix[1][2],
@@ -84,4 +84,7 @@ void draw() {
     if (data != null && !data.equals(nothing)) {
        drawObjects(data);
   }
-}}
+  else {println("no data");};
+}
+else  {println("server not ready");};
+}
