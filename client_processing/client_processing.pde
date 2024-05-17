@@ -1,8 +1,9 @@
 // not ready.
-// todo: make objects persistent
+// todo: make objects persistent?
 // todo: kalman filter?
-// # make more efficient? (applymatrix calls)
+// add logs
 import processing.net.*;
+Logger logger;
 String data = "";
 int st=0;
 int port=12346;
@@ -45,6 +46,8 @@ ArrayList<float[]> parseData(String data) {
 }
 
 void setup() {
+  logger = new Logger("log.txt");
+  logger.log("Program started");
   fullScreen(P3D, 1);
   background(255);
 
@@ -64,6 +67,7 @@ void draw() {
   //println(millis()-st);
   //st=millis();
   background(255);
+  //delay(1);
   applyMatrix(matrix[0][0], matrix[0][1], 0, matrix[0][2],
     matrix[1][0], matrix[1][1], 0, matrix[1][2],
     0, 0, 1, 0,
@@ -79,12 +83,15 @@ void draw() {
   //printArray(m.get(new float[]{}));
   fill(144);
   if (myClient.available() > 0) {
-    data = myClient.readString();
-    println(data);
-    if (data != null && !data.equals(nothing)) {
+    data = myClient.readStringUntil('\n');
+    if (data != null){
+    myClient.write("ACK\n");}
+
+    if (data != null && !data.substring(0, 7).equals(nothing)) {
        drawObjects(data);
   }
   else {println("no data");};
 }
 else  {println("server not ready");};
+//println(millis()-st);
 }
