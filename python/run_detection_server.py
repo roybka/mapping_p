@@ -1,10 +1,10 @@
 import socket
-import torch
 import numpy as np
 import time
 import cv2
 dummy = False # if you can't run a vision model locally
 if not dummy:
+    import torch
     from ultralytics import YOLO
 line_ind = 0
 plot_frames = 1
@@ -94,8 +94,8 @@ def main():
         ok, frame = vid.read()
     try:
         while True:
-            loop_time = time.time()-st
-            st = time.time()
+            # loop_time = time.time()-st
+            # st = time.time()
             if not dummy:
                 ok, frame = vid.read()
             else:
@@ -117,9 +117,11 @@ def main():
 
                 time.sleep(SLEEP_TIME)  # Delay
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q'):  # this adds latency, remove if issues arise.
                 client_socket.close()
                 break
+    except BrokenPipeError:
+        print('client closed')
     finally:
 
         client_socket.close()

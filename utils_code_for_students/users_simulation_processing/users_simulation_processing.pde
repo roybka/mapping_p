@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.HashSet;
-// todo: write method addUser to UserManager, allow to add new user with up arrow or something
 UserManager userManager;
 ArrayList<User> users;
 
