@@ -1,12 +1,16 @@
 #  AI in coding and installation workshop spring 24'
 ## Contents
-- lines is the main demo you need to start working (using mouse for simulating people movement) 
+- lines is a nice basic for demonstrating coding around locations in space (using mouse for simulating people movement)
+- in utils_code_for_students you'll find p5 and processing code that runs a simulation of people walking in space, and clearly shows where to put your code to see what would happen. 
+its also possible to add/remove people with arrows and add a mouse simulation.
+- (Advanced, in case you want to dive into things) fuller simulation - python code (needs some installations see requirements.txt) python/run_detection_server.py runs the code that detects objects, (DUMMY mode available). Use it together with client_processing to see interaction. first run the python server then the processing code. 
+- Possible objects that can be detected (not so recommended, quality is not assured for stuff other than people) is in run_detection_server.py line 15
 
 ### Contents you shouldn't care about (internal mechanisms for making it all work)
 - lines_demo is a demo using mouse for two projectors projection with no shadows (not ready yet)
 - calibrate_cam has code for calibrating the camera (not ready yet)
 - calibrate_cam has code for calibrating the projection (not ready yet(?))
-- python folder has code to calculate the trasformation matrices (needs tidying up)
+- python folder has code to calculate the trasformation matrices and run the detections server (needs tidying up)
 - use_transformation has code to project some crap using the projection transformation (one projector at the moment)
 - resources holds the files, media etc. 
 
