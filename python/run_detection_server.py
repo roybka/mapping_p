@@ -7,10 +7,10 @@ if not dummy:
     import torch
     from ultralytics import YOLO
 line_ind = 0
-plot_frames = 1
+plot_frames = 0
 traj_lines = []
 host = "127.0.0.1"
-port = 12346
+port = 12345
 classes_of_interest = [0] # 0=person
 #Available objects for detection {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
 # Note: small objects like scissors might not be detected well. read more about the  bizarre set of objects that can be detected here: https://cocodataset.org/#home
@@ -34,32 +34,34 @@ def create_server_socket(host="127.0.0.1", port=12345):
 
 
 def parse_results(results):
-    if not dummy:
-        out = 'Nothing'
-        inds = np.where([elem in classes_of_interest for elem in results[0].boxes.cls.cpu().numpy()])[0]
-        if len(inds) > 0:
-            # print(ind)
-            mask = [e in classes_of_interest for e in results[0].boxes.cls]
-            res = results[0][mask].boxes
-            if len(res):
+    try:
+        if not dummy:
+            out = 'Nothing'
+            inds = np.where([elem in classes_of_interest for elem in results[0].boxes.cls.cpu().numpy()])[0]
+            if len(inds) > 0:
+                # print(ind)
+                mask = [e in classes_of_interest for e in results[0].boxes.cls]
+                res = results[0][mask].boxes
+                if len(res):
 
-                classes = res.cls.cpu().numpy()
-                ids = res.id.cpu().numpy()
-                confs = res.conf.cpu().numpy()
-                locs = res.xywh.cpu().numpy()
-                out = ''
-                for i in range(len(ids)):
-                    out += str([ids[i], classes[i], confs[i]] + list(locs[i]))+','
-                    # output structure: [id,cls,conf,x,y,w,h],[.....],[.....]
-                out = out[:-1]
-        return out+'\n'
-    else: # dummy mode
-        global line_ind, traj_lines
-        line_ind += 1
-        if line_ind == len(traj_lines):
-            line_ind=0
-        return str(traj_lines[line_ind])
-
+                    classes = res.cls.cpu().numpy()
+                    ids = [0] if res.id is None else res.id.cpu().numpy()
+                    confs = res.conf.cpu().numpy()
+                    locs = res.xywh.cpu().numpy()
+                    out = ''
+                    for i in range(len(ids)):
+                        out += str([ids[i], classes[i], confs[i]] + list(locs[i]))+','
+                        # output structure: [id,cls,conf,x,y,w,h],[.....],[.....]
+                    out = out[:-1]
+            return out+'\n'
+        else: # dummy mode
+            global line_ind, traj_lines
+            line_ind += 1
+            if line_ind == len(traj_lines):
+                line_ind=0
+            return str(traj_lines[line_ind])
+    except Exception as e:
+        print(res,e)
 
 def send_data(data, client_socket):
     client_socket.sendall(data)
