@@ -16,6 +16,9 @@ classes_of_interest = [0] # 0=person
 # Note: small objects like scissors might not be detected well. read more about the  bizarre set of objects that can be detected here: https://cocodataset.org/#home
 SLEEP_TIME = 0.001
 CONF = 0.35
+cam_width = 1280
+cam_height = 720
+do_y_pos_corr = False
 
 
 def load_dummy_trajectories(path='../resources/dummy_trajecories.txt'):
@@ -33,6 +36,16 @@ def create_server_socket(host="127.0.0.1", port=12345):
     return server_socket
 
 
+def correct_ypos(locs):
+    out = []
+    for loc in locs:
+        close_to_0 = (cam_height-loc[1])/cam_height
+        correction = close_to_0 * loc[3]/2
+        loc[1] = loc[1] + correction
+        out.append(loc)
+    return out
+
+
 def parse_results(results):
     try:
         if not dummy:
@@ -48,6 +61,8 @@ def parse_results(results):
                     ids = [0] if res.id is None else res.id.cpu().numpy()
                     confs = res.conf.cpu().numpy()
                     locs = res.xywh.cpu().numpy()
+                    if do_y_pos_corr:
+                        locs = correct_ypos(locs)
                     out = ''
                     for i in range(len(ids)):
                         out += str([ids[i], classes[i], confs[i]] + list(locs[i]))+','
@@ -93,6 +108,8 @@ def main():
     print("Got a connection from %s" % str(addr))
     if not dummy:
         vid = cv2.VideoCapture(0)
+        vid.set(3, cam_width)
+        vid.set(4, cam_height)
         ok, frame = vid.read()
     try:
         while True:
