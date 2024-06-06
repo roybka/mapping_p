@@ -19,7 +19,7 @@ CONF = 0.35
 cam_width = 1280
 cam_height = 720
 do_y_pos_corr = False
-
+do_x_pos_corr = False
 
 def load_dummy_trajectories(path='../resources/dummy_trajecories.txt'):
     global traj_lines
@@ -45,6 +45,20 @@ def correct_ypos(locs):
         out.append(loc)
     return out
 
+def correct_xpos(locs):
+    out = []
+    middle=cam_width/2
+    for loc in locs:
+        if loc[0]<middle:
+
+            close_to_left = (cam_width/2-loc[0])/(cam_width/2) # 1 if left, 0 if center
+            correction = close_to_left * loc[2]/2
+        else:
+            close_to_right = abs(cam_width/2-loc[0])/(cam_width/2) # 1 if right, 0 if center
+            correction = - close_to_right * loc[2]/2
+        loc[0] = loc[0] + correction
+        out.append(loc)
+    return out
 
 def parse_results(results):
     try:
@@ -63,6 +77,8 @@ def parse_results(results):
                     locs = res.xywh.cpu().numpy()
                     if do_y_pos_corr:
                         locs = correct_ypos(locs)
+                    if do_x_pos_corr:
+                        locs = correct_xpos(locs)
                     out = ''
                     for i in range(len(ids)):
                         out += str([ids[i], classes[i], confs[i]] + list(locs[i]))+','
@@ -117,6 +133,8 @@ def main():
             # st = time.time()
             if not dummy:
                 ok, frame = vid.read()
+                if cam_height==720:
+                    frame=np.concatenate((frame, np.zeros((960 - 720, 1280, 3), dtype='uint8')))
             else:
                 ok=True
             if ok:
