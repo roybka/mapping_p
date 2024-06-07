@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import pandas as pd
 
-is_projector = False
+is_projector = 0
 path = '../resources'
 if is_projector:
     df=pd.read_csv(os.path.join(path,'rectangle_corners.csv'),header=None)
