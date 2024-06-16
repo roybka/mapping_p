@@ -1,8 +1,10 @@
 import socket
+import threading
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 import numpy as np
 import time
 import cv2
-dummy = False # if you can't run a vision model locally
+dummy = 1 # if you can't run a vision model locally
 if not dummy:
     import torch
     from ultralytics import YOLO
@@ -20,6 +22,7 @@ cam_width = 1280
 cam_height = 720
 do_y_pos_corr = False
 do_x_pos_corr = False
+global keep_running
 
 def load_dummy_trajectories(path='../resources/dummy_trajecories.txt'):
     global traj_lines
@@ -60,6 +63,7 @@ def correct_xpos(locs):
         out.append(loc)
     return out
 
+
 def parse_results(results):
     try:
         if not dummy:
@@ -94,10 +98,14 @@ def parse_results(results):
     except Exception as e:
         print(res,e)
 
-def send_data(data, client_socket):
-    client_socket.sendall(data)
-    client_socket.settimeout(1)  # Timeout after 5 seconds
 
+def send_data(data, client_socket):
+    global keep_running
+    try:
+        client_socket.sendall(data)
+        client_socket.settimeout(1)  # Timeout after 5 seconds
+    except BrokenPipeError:
+        keep_running=False
     try:
         ack = client_socket.recv(1024).decode('utf-8').strip()
         if ack == "ACK":
@@ -107,9 +115,25 @@ def send_data(data, client_socket):
             print("Unexpected response received")
     except socket.timeout:
         print("No acknowledgment received within timeout period")
+    except BrokenPipeError:
+        print('broken')
+        keep_running=0
 
+
+# def check_socket_status(client_socket):
+#     try:
+#         # Peek at the data in the socket without removing it from the buffer
+#         data = client_socket.recv(1, socket.MSG_PEEK)
+#         if not data:  # No data means the socket is closed
+#             raise BrokenPipeError
+#         else:
+#             print('ok')
+#     except socket.error:
+#         raise BrokenPipeError
 
 def main():
+    global  keep_running
+    keep_running=True
     st = time.time()
     if not dummy:
         model = YOLO('yolov8m.pt') # load a computer vision detection model.
@@ -128,9 +152,14 @@ def main():
         vid.set(4, cam_height)
         ok, frame = vid.read()
     try:
-        while True:
-            # loop_time = time.time()-st
-            # st = time.time()
+        executor = ThreadPoolExecutor(max_workers=5)
+        while keep_running:
+            loop_time = time.time()-st
+            # print(loop_time)
+            st = time.time()
+            # check_socket_status(client_socket)
+             # Adjust max_workers as needed
+
             if not dummy:
                 ok, frame = vid.read()
                 if cam_height==720:
@@ -150,8 +179,10 @@ def main():
                 else:
                     r = parse_results(None)
                 data = r.encode('utf-8')
-                send_data(data, client_socket)
-
+                # st=time.time()
+                # send_data(data, client_socket)
+                executor.submit(send_data, data, client_socket)
+                # print('taken ',time.time()-st)
                 time.sleep(SLEEP_TIME)  # Delay
 
             if cv2.waitKey(1) & 0xFF == ord('q'):  # this adds latency, remove if issues arise.
@@ -160,7 +191,7 @@ def main():
     except BrokenPipeError:
         print('client closed')
     finally:
-
+        executor.shutdown(wait=False)
         client_socket.close()
         if not dummy:
             vid.release()
