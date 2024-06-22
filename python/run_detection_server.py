@@ -16,12 +16,14 @@ port = 12345
 classes_of_interest = [0] # 0=person
 #Available objects for detection {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
 # Note: small objects like scissors might not be detected well. read more about the  bizarre set of objects that can be detected here: https://cocodataset.org/#home
-SLEEP_TIME = 0.001
+SLEEP_TIME = 0.0001
 CONF = 0.35
 cam_width = 1280
 cam_height = 720
-do_y_pos_corr = False
-do_x_pos_corr = False
+do_y_pos_corr = 1
+do_x_pos_corr = 1
+debug_timing = 1
+st=0
 global keep_running
 
 def load_dummy_trajectories(path='../resources/dummy_trajecories.txt'):
@@ -98,7 +100,6 @@ def parse_results(results):
     except Exception as e:
         print(res,e)
 
-
 def send_data(data, client_socket):
     global keep_running
     try:
@@ -119,23 +120,12 @@ def send_data(data, client_socket):
         print('broken')
         keep_running=0
 
-
-# def check_socket_status(client_socket):
-#     try:
-#         # Peek at the data in the socket without removing it from the buffer
-#         data = client_socket.recv(1, socket.MSG_PEEK)
-#         if not data:  # No data means the socket is closed
-#             raise BrokenPipeError
-#         else:
-#             print('ok')
-#     except socket.error:
-#         raise BrokenPipeError
-
 def main():
     global  keep_running
     keep_running=True
     st = time.time()
     if not dummy:
+        torch.cuda.set_device(0)
         model = YOLO('yolov8m.pt') # load a computer vision detection model.
         if torch.cuda.is_available():
             model.cuda()
@@ -143,15 +133,19 @@ def main():
     else:
         load_dummy_trajectories()
     server_socket = create_server_socket(host, port)
+
     client_socket, addr = server_socket.accept()
-    client_socket.settimeout(1)
+    client_socket.settimeout(0.0001)
+
     print("Got a connection from %s" % str(addr))
+
     if not dummy:
         vid = cv2.VideoCapture(0)
         vid.set(3, cam_width)
         vid.set(4, cam_height)
         ok, frame = vid.read()
     try:
+
         executor = ThreadPoolExecutor(max_workers=5)
         while keep_running:
             loop_time = time.time()-st
@@ -168,8 +162,7 @@ def main():
                 ok=True
             if ok:
                 if not dummy:
-                    results = model.track(frame, persist=True, conf=CONF, stream=False)
-
+                    results = model.track(frame, persist=True, conf=CONF, stream=False,imgsz=cam_width)
                     # Visualize the results on the frame
                     if plot_frames:
                         annotated_frame = results[0].plot()
@@ -185,9 +178,9 @@ def main():
                 # print('taken ',time.time()-st)
                 time.sleep(SLEEP_TIME)  # Delay
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):  # this adds latency, remove if issues arise.
-                client_socket.close()
-                break
+            # if cv2.waitKey(1) & 0xFF == ord('q'):  # this adds latency, remove if issues arise.
+            #     client_socket.close()
+            #     break
     except BrokenPipeError:
         print('client closed')
     finally:
